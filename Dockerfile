@@ -1,15 +1,19 @@
-FROM node:18-alpine
+FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY package.json .
+RUN apt-get update -y && \
+    apt-get upgrade -y
 
-RUN npm install
+COPY requirements.txt /app
 
-COPY . .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN npm run build
+COPY . /app
 
-EXPOSE 3000
+# Chmod to entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
-CMD npm start
+# Run entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
